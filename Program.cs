@@ -26,23 +26,25 @@ foreach (string project in projectsArray)
     //generates description and processes image and link information
     string[] description = Regex.Split(fields[2], @"\[\[|\]\]").Where(a => a != "").ToArray();
 
-    string[] links = fields[8].Replace("\r", "").Split(",").Select(
-        a => "<a href=\"" + a.Split("---")[1] + "\" target=\"none\">" + a.Split("---")[0] + "</a>\n").ToArray();
+    string[] links = fields[8].Replace("\r", "") != "null" ? fields[8].Replace("\r", "").Split(",").Select(
+        a => "<a href=\"" + a.Split("---")[1] + "\" target=\"none\">" + a.Split("---")[0] + "</a>\n").ToArray() : new string[] { "null" };
 
     //determines whether odd or even indices are images
     int remainder = Regex.IsMatch(fields[2], @"^\[\[") ? 0 : 1;
 
+    string linksText = links[0] != "null" ? "<p class=\"a_container\">\n" + string.Join(" • ", links) + "</p>" : "";
+
     description = description.Select(
         //figures out whether the current item is media or text
-        (a, i) => i % 2 == remainder ? 
+        (a, i) => i % 2 == remainder ?
         //generates for images or videos
-        (a.Split(",")[0].Split(".").Last() == "mp4" ? 
-            $"<video controls>\n<source src=\"./assets/{Regex.Split(a, @"(?<!\\),")[0].Replace("\\", "")}\" type=\"video/mp4\" />\nSorry, your browser doesn't support embedded videos.\n</video>\n" : 
-            "<img src=\"./assets/" + Regex.Split(a, @"(?<!\\),")[0].Replace("\\", "") + "\" title=\"" + Regex.Split(a, @"(?<!\\),")[1].Replace("\\", "") + "\" alt=\"" + Regex.Split(a, @"(?<!\\),")[1].Replace("\\", "") + "\"/>\n") : 
+        descText(a, i) : 
         //generates text
         "<p>" + a + "</p>\n"
         //adds links to description
-        ).Append("<p class=\"a_container\">\n" + string.Join(" • ", links) + "</p>").ToArray();
+        ).Append(linksText).ToArray();
+
+    string field9 = fields[9].Replace("\r", "") == "" ? "" : $"<p>{fields[9].Replace("\r", "")}</p>";
 
     //adds the project to 
     //3d printing
@@ -56,6 +58,7 @@ foreach (string project in projectsArray)
             (!fields[0].Contains("$$") ? $"<h1>{fields[0].Replace("$", "")}</h1>\n" : "") +
             $"<div class=\"details\">\n" +
             $"<h2>{fields[0].Replace("$", "")}</h2>\n" +
+            $"{field9}" +
             $"{string.Join("", description)}\n" +
             $"</div>\n" +
             $"</div>\n\n";
@@ -71,6 +74,7 @@ foreach (string project in projectsArray)
             (!fields[0].Contains("$$") ? $"<h1>{fields[0].Replace("$", "")}</h1>\n" : "") +
             $"<div class=\"details\">\n" +
             $"<h2>{fields[0].Replace("$", "")}</h2>\n" +
+            $"{field9}" +
             $"{string.Join("", description)}\n" +
             $"</div>\n" +
             $"</div>\n\n";
@@ -86,6 +90,7 @@ foreach (string project in projectsArray)
             (!fields[0].Contains("$$") ? $"<h1>{fields[0].Replace("$", "")}</h1>\n" : "") +
             $"<div class=\"details\">\n" +
             $"<h2>{fields[0].Replace("$", "")}</h2>\n" +
+            $"{field9}" +
             $"{string.Join("", description)}\n" +
             $"</div>\n" +
             $"</div>\n\n";
@@ -120,3 +125,13 @@ for (int i = 0; i < finalString.Length; i++)
 }
 
 Console.WriteLine("Done writing output to file");
+
+string descText(string a, int i)
+{
+    if (a.Split(",")[0].Split(".").Last() == "mp4")
+    {
+        return $"<video controls>\n<source src=\"./assets/{Regex.Split(a, @"(?<!\\),")[0].Replace("\\", "")}\" type=\"video/mp4\" />\nSorry, your browser doesn't support embedded videos.\n</video>\n";
+    }
+    
+    return  "<img src=\"./assets/" + Regex.Split(a, @"(?<!\\),")[0].Replace("\\", "") + "\" title=\"" + Regex.Split(a, @"(?<!\\),")[1].Replace("\\", "") + "\" alt=\"" + Regex.Split(a, @"(?<!\\),")[1].Replace("\\", "") + "\"/>\n";
+}
