@@ -39,6 +39,7 @@ foreach (string project in projectsArray)
             $"<div class=\"square\"><img src=\"./assets/{fields[7]}\" /></div>\n" +
             $"<div class=\"background\"></div>\n" +
             $"<div class=\"arrow\"></div>\n" +
+            $"<div class=\"clippy\"></div>\n" +
             $"</div>\n" +
             $"<div class=\"desc\">\n" +
             $"<p>{fields[2]}</p>\n" +
@@ -76,15 +77,13 @@ foreach (string project in projectsArray)
             //adds links to description
             ).Append(linksText).ToArray();
 
-
         string field9 = fields[9].Replace("\r", "") == "" ? "" : $"<p class=\"blurb\">{fields[9].Replace("\r", "")}</p>";
 
-        string year = fields[10].Replace("\r", "") == "" ? "" : $"<p class=\"year\">{Regex.Replace(fields[10].Replace("\r", ""), @"^20", "\'")}</p>\n";
-
+        string year = fields[10].Replace("\r", "") == "" ? "" : $"<p class=\"year\">{fields[10].Replace("\r", "")}</p>\n";
 
         toAdd = $"<div class=\"item\" id=\"{fields[0].Replace("$", "").Replace(" ", "-")}\">\n" +
                 $"<input type=\"checkbox\" />\n" +
-                $"<div class=\"square\"><img src=\"./assets/{fields[7]}\" /></div>\n" +
+                $"<div class=\"square {(fields[11].Contains('y') ? "star" : "")}\"><img src=\"./assets/{fields[7]}\" /></div>\n" +
                 $"<div class=\"background\"></div>\n<div class=\"arrow\"></div>\n" +
                 $"{year}\n" +
                 (!fields[0].Contains("$$") ? $"<h1>{fields[0]}</h1>\n" : "") +
@@ -149,12 +148,12 @@ string descText(string a, int i)
 
     if (a.Split(",")[0].Split(".").Last() == "mp4")
     {
-        return $"<video controls muted>\n<source src=\"./assets/{temp[0].Replace("\\", "")}\" type=\"video/mp4\" />\nSorry, your browser doesn't support embedded videos.\n</video>\n";
+        return $"<video controls>\n<source src=\"./assets/{temp[0].Replace("\\", "")}\" type=\"video/mp4\" />\nSorry, your browser doesn't support embedded videos.\n</video>\n";
     }
     else if (a == "break")
     {
         return $"<div class=\"break\"></div>";
     }
 
-    return  "<img src=\"./assets/" + temp[0].Replace("\\", "") + "\" title=\"" + temp[1].Replace("\\", "") + "\" alt=\"" + temp[1].Replace("\\", "") + "\"/>\n";
+    return "<img loading=\"lazy\" src=\"./assets/" + temp[0].Replace("\\", "") + "\" title=\"" + temp[1].Replace("\\", "") + "\" alt=\"" + temp[1].Replace("\\", "") + "\"/>\n";
 }
