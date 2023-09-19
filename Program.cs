@@ -20,6 +20,7 @@ string[] projectsArray = splitter.Split(File.ReadAllText(inputFilePath)).Where(a
     Console.WriteLine($"Done reading input file ({projectsArray.Length} items)");
 //generates HTML for each project in the list
 string[] finalString = { "", "", "" };
+string extraString = "";
 foreach (string project in projectsArray)
 {   
     string[] fields = project.Split("\t");
@@ -95,24 +96,35 @@ foreach (string project in projectsArray)
                 $"</div>\n\n";
     }
 
+    bool done = false;
     //adds the project to 
     //3d printing
     if (fields[4] == "1")
     {
         finalString[0] += toAdd;
+        done = true;
     }
     //art
     if (fields[5] == "1")
     {
         finalString[1] += toAdd;
+        done = true;
     }
     //coding
     if (fields[6] == "1")
     {
         finalString[2] += toAdd;
+        done = true;
+    }
+
+    if (!done)
+    {
+        extraString += toAdd;
     }
 
     Console.WriteLine("Done processing " + fields[0]);
+
+
 }
 
 //writes output to 3 files for each category
@@ -138,6 +150,11 @@ for (int i = 0; i < finalString.Length; i++)
     }
 
     File.WriteAllText(inputFilePath + "-output-" + add + ".txt", finalString[i]);
+}
+
+if (extraString != "")
+{
+    File.WriteAllText(inputFilePath + "-output-extra.txt", extraString);
 }
 
 Console.WriteLine("Done writing output to file");
